@@ -1,24 +1,33 @@
 {
   "name": "reducer-state",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
+  "source": "src/index.tsx",
+  "exports": "./dist/index.modern.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
   "scripts": {
     "test": "tsc && ava",
     "lint-staged": "lint-staged",
-    "prepare": "husky install"
+    "build": "microbundle --external react --globals react=React --strict --no-compress --jsx React.createElement",
+    "example": "parcel example/index.html --dist-dir example/dist"
   },
   "devDependencies": {
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
     "ava": "^3.15.0",
+    "husky": "^7.0.0",
     "lint-staged": "^11.0.0",
+    "microbundle": "^0.13.3",
+    "parcel": "^2.0.0-beta.3.1",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "ts-node": "^10.0.0",
-    "typescript": "^4.3.5",
-    "husky": "^7.0.0"
+    "typescript": "^4.3.5"
   },
-  "lint-staged": "prettier --write"
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": "prettier --write"
+  }
 }
