@@ -2,3 +2,5 @@
 .husky
 node_modules
 *.log
+
+example/dist

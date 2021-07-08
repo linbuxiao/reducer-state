@@ -4,9 +4,10 @@
   "license": "MIT",
   "source": "src/index.tsx",
   "exports": "./dist/index.modern.js",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "tsc && ava",
     "lint-staged": "lint-staged",
