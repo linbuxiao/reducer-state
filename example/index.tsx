@@ -24,7 +24,8 @@ const reducer = (state: typeof init, action: any) => {
 const Store = createContainer(reducer, init)
 
 const useOnClick = () => {
-  return () => Store.dispatch({ type: "ON_CLICK" });
+  const { dispatch } = React.useContext(Store.Context)
+  return () => dispatch({ type: "ON_CLICK" });
 };
 
 const Click = () => {
@@ -39,10 +40,11 @@ const Click = () => {
 }
 
 const useTime = () => {
+  const { dispatch } = React.useContext(Store.Context)
   React.useEffect(()=> {
-    const interval = setInterval(()=> Store.dispatch({ type: "ON_TIME" }), 1000)
+    const interval = setInterval(()=> dispatch({ type: "ON_TIME" }), 1000)
     return () => clearInterval(interval)
-  }, [Store.dispatch])
+  }, [dispatch])
 }
 
 const Time = () => {
