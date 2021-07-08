@@ -11,6 +11,7 @@ interface SelectorFn<S, Selected> {
 }
 
 function createContainer<S, A>(reducer: React.Reducer<S, A>, init: S) {
+	let GlobalDispatch = null
 	const Context = React.createContext<MemoContext<S, A>>(
 		{} as MemoContext<S, A>,
 	)
@@ -20,7 +21,7 @@ function createContainer<S, A>(reducer: React.Reducer<S, A>, init: S) {
 		children: React.ReactNode
 	}) => {
 		const [store, dispatch] = React.useReducer(reducer, init)
-
+		GlobalDispatch = dispatch
 		const storeRef = React.useRef(store)
 		storeRef.current = store
 
@@ -77,7 +78,7 @@ function createContainer<S, A>(reducer: React.Reducer<S, A>, init: S) {
 	}
 
 	return {
-		Context,
+		dispatch: GlobalDispatch,
 		Provider,
 		useSelector,
 	}
