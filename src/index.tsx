@@ -10,7 +10,36 @@ interface SelectorFn<S, Selected> {
 	(value: S): Selected
 }
 
-function createContainer<S, A>(reducer: React.Reducer<S, A>, init: S) {
+export interface Container<S, A> {
+	Provider: React.FC<any>
+	Context: React.Context<MemoContext<S, A>>
+	useSelector: <Selected>(selector: SelectorFn<S, Selected>) => Selected
+	useDispatch: () => React.Dispatch<A>
+}
+
+interface ContainerProps<S, A> {
+	reducer: React.Reducer<S, A>
+	init: S
+	enhance?: Function
+}
+
+interface createContainerInterface {
+	<S, A>(
+		reducer: React.Reducer<S, A>,
+		init: S,
+		enhance?: Function | undefined,
+	): Container<S, A>
+}
+
+function createContainer<S, A>(
+	reducer: React.Reducer<S, A>,
+	init: S,
+	enhance?: Function,
+): Container<S, A> {
+	if (enhance) {
+		return enhance(createContainer)(reducer, init)
+	}
+
 	const Context = React.createContext<MemoContext<S, A>>(
 		{} as MemoContext<S, A>,
 	)
@@ -103,4 +132,29 @@ function combineReducers<S extends Record<string, any>, A>(
 	}
 }
 
-export { createContainer, combineReducers }
+function applyMiddleWare<S, A>(...middlewares: any[]) {
+	return (createContainer: createContainerInterface) =>
+		(reducer: React.Reducer<S, A>, init: S, enhance?: Function) => {
+			const Store = createContainer(reducer, init)
+			function useDispatch() {
+				const dispatch = Store.useDispatch()
+				const _dispatch = (action: any) => {
+					return compose(...middlewares)(dispatch)
+				}
+
+				return _dispatch
+			}
+
+			return { ...Store, useDispatch }
+		}
+}
+
+function compose(...funcs: Function[]) {
+	return funcs.reduce(
+		(a, b) =>
+			(...args: any) =>
+				a(b(...args)),
+	)
+}
+
+export { createContainer, combineReducers, applyMiddleWare }

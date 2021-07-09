@@ -1,6 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { createContainer, combineReducers } from "../src/index"
+import { createContainer, combineReducers, applyMiddleWare } from "../src/index"
+import autoLogger from "./enhancer"
 
 const init = { click: 0, time: 0 }
 
@@ -38,8 +39,41 @@ const reducerTest = (state: typeof init, action: any) => {
   }
 }
 
+const applyMiddleWare1 = (useDispatch) => {
+  const _useDispatch = () => {
+    const dispatch = useDispatch()
+    const _dispatch = (action) => {
+      console.log("第一层中间件");
+      
+      return dispatch(action)
+    }
 
-const Store = createContainer(combineReducers({reducer, reducerTest}), { reducer: init, reducerTest: init })
+    return _dispatch
+  }
+
+  return _useDispatch
+}
+
+const applyMiddleWare2 = (useDispatch) => {
+  
+  const _useDispatch = () => {
+    const dispatch = useDispatch()
+    const _dispatch = (action) => {
+      console.log("第二层中间件");
+      
+      return dispatch(action)
+    }
+
+    return _dispatch
+  }
+
+  return _useDispatch
+}
+
+
+const Store = createContainer(combineReducers({reducer, reducerTest}), { reducer: init, reducerTest: init }, applyMiddleWare(applyMiddleWare1, applyMiddleWare2))
+
+
 
 const Click = () => {
   const dispatch  = Store.useDispatch()
