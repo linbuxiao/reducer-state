@@ -75,11 +75,30 @@ function createContainer<S, A>(reducer: React.Reducer<S, A>, init: S) {
 		return selectStateRef.current
 	}
 
+	function useDispatch() {
+		const store = React.useContext(Context) as MemoContext<S, A>
+		return store.dispatch
+	}
+
 	return {
 		Context,
 		Provider,
 		useSelector,
+		useDispatch,
 	}
 }
 
-export { createContainer }
+function combineReducers<S extends Record<string, any>, A>(
+	reducers: { [key in string]: React.Reducer<any, any> },
+): React.Reducer<S, A> {
+	return function (state, action) {
+		const newState = Object.create(null)
+		Object.entries(reducers).forEach(([key, reducer]) => {
+			const childrenState = state[key]
+			newState[key] = reducer(childrenState, action)
+		})
+		return newState
+	}
+}
+
+export { createContainer, combineReducers }

@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { createContainer } from "../src/index"
+import { createContainer, combineReducers } from "../src/index"
 
 const init = { click: 0, time: 0 }
 
@@ -21,16 +21,30 @@ const reducer = (state: typeof init, action: any) => {
   }
 }
 
-const Store = createContainer(reducer, init)
+const reducerTest = (state: typeof init, action: any) => {
+  switch(action.type) {
+    case "ON_CLICK": {
+      return {
+        ...state,
+        click: state.click + 1
+      }
+    }
+    case "ON_TIME": {
+      return {
+        ...state,
+        time: state.time + 1
+      }
+    }
+  }
+}
 
-const useOnClick = () => {
-  const { dispatch } = React.useContext(Store.Context)
-  return () => dispatch({ type: "ON_CLICK" });
-};
+
+const Store = createContainer(combineReducers({reducer, reducerTest}), { reducer: init, reducerTest: init })
 
 const Click = () => {
-  const decrement = useOnClick()
-  const click = Store.useSelector(state => state.click)
+  const dispatch  = Store.useDispatch()
+  const decrement = () => dispatch({ type: "ON_CLICK" })
+  const click = Store.useSelector(state => state.reducer.click)
   console.log("click render");
   
 	return <>
@@ -39,17 +53,13 @@ const Click = () => {
   </>
 }
 
-const useTime = () => {
-  const { dispatch } = React.useContext(Store.Context)
+const Time = () => {
+  const dispatch  = Store.useDispatch()
   React.useEffect(()=> {
     const interval = setInterval(()=> dispatch({ type: "ON_TIME" }), 1000)
     return () => clearInterval(interval)
   }, [dispatch])
-}
-
-const Time = () => {
-  useTime()
-  const time = Store.useSelector(state => state.time)
+  const time = Store.useSelector(state => state.reducerTest.time)
   console.log("time render");
   return <div>Time: {time}</div>
 }
