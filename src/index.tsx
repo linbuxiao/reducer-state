@@ -92,12 +92,14 @@ function combineReducers<S extends Record<string, any>, A>(
 	reducers: { [key in string]: React.Reducer<any, any> },
 ): React.Reducer<S, A> {
 	return function (state, action) {
+		let hasChange = false
 		const newState = Object.create(null)
 		Object.entries(reducers).forEach(([key, reducer]) => {
 			const childrenState = state[key]
 			newState[key] = reducer(childrenState, action)
+			hasChange = hasChange || childrenState !== newState[key]
 		})
-		return newState
+		return hasChange ? newState : state
 	}
 }
 
