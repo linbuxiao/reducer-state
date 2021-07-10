@@ -136,14 +136,7 @@ function applyMiddleWare<S, A>(...middlewares: any[]) {
 	return (createContainer: createContainerInterface) =>
 		(reducer: React.Reducer<S, A>, init: S, enhance?: Function) => {
 			const Store = createContainer(reducer, init)
-			function useDispatch() {
-				const dispatch = Store.useDispatch()
-				const _dispatch = (action: any) => {
-					return compose(...middlewares)(dispatch)
-				}
-
-				return _dispatch
-			}
+			const useDispatch =  compose(...middlewares)(Store.useDispatch)
 
 			return { ...Store, useDispatch }
 		}
